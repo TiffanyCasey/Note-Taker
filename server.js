@@ -9,6 +9,18 @@ const PORT = process.env.PORT || 8080;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// HTML ROUTES
+
+// returns notes.html file
+app.get("/notes", function(req, res) {
+    res.sendFile(path.join(__dirname, "/public/notes.html"));
+  });
+
+// returns index.html file
+app.get("/notes", function(req, res) {
+  res.sendFile(path.join(__dirname, "/public/index.html"));
+});
+
 // Starts the server to begin listening
 app.listen(PORT, () => {
   console.log('App listening on PORT: ' + PORT);
