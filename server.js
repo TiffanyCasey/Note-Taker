@@ -4,13 +4,16 @@ const path = require('path');
 const fs = require("fs");
 const noteText = require(__dirname, "/db/db.json");
 
+
+
 // Sets up the Express App
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Sets up the Express app to handle data parsing
+// Sets up the Express app to handle data parsing and to read static files
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static(__dirname + '/public'));
 
 // HTML ROUTES
 
@@ -21,7 +24,7 @@ app.get("/notes", (req, res) => {
   });
 
 // returns index.html file
-app.get("/", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/index.html"));
   console.log("html")
   });
@@ -36,8 +39,12 @@ app.get("/api/notes", (req, res) => {
 // Receives a new note to save on the request body and adds to db.json file and returns note to client
 app.post("/api/notes"),(req, res) => {
   const newNote = req.body;
+    newNote.id = uniqueID();
+    console.log(newNote);
+    
     noteText.push(newNote);
     res.json(true);
+    
 }
 
 // Receives query parameter containing ID of the note to delete. 
