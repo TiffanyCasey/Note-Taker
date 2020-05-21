@@ -4,8 +4,6 @@ const path = require('path');
 const fs = require("fs");
 const noteText = require(__dirname, "/db/db.json");
 
-
-
 // Sets up the Express App
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -13,7 +11,7 @@ const PORT = process.env.PORT || 8080;
 // Sets up the Express app to handle data parsing and to read static files
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + "/public"));
 
 // HTML ROUTES
 
@@ -38,20 +36,20 @@ app.get("/api/notes", (req, res) => {
 
 // Receives a new note to save on the request body and adds to db.json file and returns note to client
 app.post("/api/notes"),(req, res) => {
-  const newNote = req.body;
-    newNote.id = uniqueID();
-    console.log(newNote);
+    fs.writeFileSync("/public/notes.html", noteText(noteText));
     
-    noteText.push(newNote);
-    res.json(true);
-    
-}
+    if (err) {
+      throw err;
+    }
+};
 
+
+//https://www.codota.com/code/javascript/functions/express/Router/delete
 // Receives query parameter containing ID of the note to delete. 
 app.delete("/api/notes/:id"), (req, res) => {
-   res.send('Delete')
+  let id = parseInt[req.params.id];
+    delete noteText[id];
 }
-
 
 // Starts the server to begin listening
 app.listen(PORT, () => {
