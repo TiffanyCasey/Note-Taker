@@ -53,7 +53,7 @@ app.delete("/api/notes/:id", (req, res) => {
   console.log("REQ.PARAMS.ID", req.params.id)
 
   // writes all new notes to db.json
-  fs.writeFile("./db/db.json", JSON.stringify(noteID), (err) => {
+  fs.writeFileSync("./db/db.json", JSON.stringify(noteID), (err) => {
    if (err) throw err; 
    res.json(savedNotes);
    });
