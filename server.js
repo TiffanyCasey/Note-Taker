@@ -2,12 +2,12 @@
 const express = require('express');
 const path = require('path');
 const fs = require("fs");
-const noteText = require("./db/db.json");
-const { v4: uuidv4 } = require('uuid');
+const db = require("./db/db.json");
+const crypto = require("crypto");
 
 // Sets up the Express App
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 9080;
 
 // Sets up the Express app to handle data parsing and to read static files
 app.use(express.urlencoded({ extended: true }));
@@ -19,40 +19,41 @@ app.use(express.static(__dirname + "/public"));
 
 // Reads db.json file and returns all saved notes as JSON
 app.get("/api/notes", (req, res) => {
-    console.log("text in get:", JSON.stringify(noteText))
-    return res.json(noteText);
+    return res.json(db);
   });
 
-// // Receives a new note to save on the request body and adds to db.json file and returns note to client
-// app.post("/api/notes", (req, res) => {
+// Receives a new note to save on the request body and adds to db.json file and returns note to client
+app.post("/api/notes", (req, res) => {
+  let savedNotes = JSON.parse(fs.readFileSync("./db/db.json")); // reads db.json
+  let id = crypto.randomBytes(16).toString("hex"); // creates unique ID for each note 
+  let newNote = { // creates a new note object with the ID 
+    title: req.body.title,
+    text: req.body.text, 
+    id: id,
+  }
 
+  console.log("newNote:", newNote)
 
-//    let input = JSON.stringify(req.body);
+    // pushes the new notes to the notes.index page 
+    savedNotes.push(newNote);
 
-//    let postId = uuidv4();
+    // writes all new notes to db.json
+    fs.writeFile("./db/db.json", JSON.stringify(savedNotes), (err) => {
+    if (err) throw err; 
+    res.json(savedNotes);
+    });
+    console.log("new note has been written");
+});
 
-//    // create a new object with what is in the object that has new post + new id 1) read file, .then write file
-//     fs.readFile ("./db/db.json", (err, data) => {
-//       console.log("text in post:", JSON.stringify(noteText))
-//     });
-
-//       // . then 
-
-//     // fs.writeFile("./db/db.json",input);
-    
-
-//     // console.log("input:", input)
-//     // res.json(input);
-// });
 
 //https://www.codota.com/code/javascript/functions/express/Router/delete
 // Receives query parameter containing ID of the note to delete. 
 // Get all the notes from the database with a read file and use filter function .filter to filter out the id and write back to the file minus the one that was filtered out 
-app.delete("/api/notes/:id"), (req, res) => {
+app.delete("/api/notes/:id", (req, res) => {
+  let savedNotes = JSON.parse(fs.readFileSync("./db/db.json")); // reads db.json
+
   console.log("DELETE")
-  let id = parseInt(req.params.id);
-    delete noteText[id];
-}
+});
 
 
 
@@ -62,13 +63,13 @@ app.delete("/api/notes/:id"), (req, res) => {
 app.get("/notes", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/notes.html"));
   console.log("notes")
-  });
+});
 
 // returns index.html file
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/index.html"));
   console.log("html")
-  });
+});
 
 // Starts the server to begin listening
 app.listen(PORT, () => {
