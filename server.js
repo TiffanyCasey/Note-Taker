@@ -45,17 +45,23 @@ app.post("/api/notes", (req, res) => {
     console.log("new note has been written");
 });
 
-
-//https://www.codota.com/code/javascript/functions/express/Router/delete
+https://stackoverflow.com/questions/52909217/how-to-delete-by-id-in-node-js/52909282
 // Receives query parameter containing ID of the note to delete. 
 // Get all the notes from the database with a read file and use filter function .filter to filter out the id and write back to the file minus the one that was filtered out 
 app.delete("/api/notes/:id", (req, res) => {
   let savedNotes = JSON.parse(fs.readFileSync("./db/db.json")); // reads db.json
+  let noteID = savedNotes.filter(x=>x.id!=req.params.id) // returns route with all notes EXCEPT the ID we are deleting 
 
-  console.log("DELETE")
+  console.log("NOTE ID", noteID)
+  console.log("REQ.PARAMS.ID", req.params.id)
+
+  // writes all new notes to db.json
+  fs.writeFile("./db/db.json", JSON.stringify(noteID), (err) => {
+   if (err) throw err; 
+   res.json(savedNotes);
+   });
+   console.log("Delete note");
 });
-
-
 
 // HTML ROUTES
 
