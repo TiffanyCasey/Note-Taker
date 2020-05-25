@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.static(__dirname + "/public"));
 
 
-// API ROUTES
+//______________ API ROUTES ______________
 
 // Reads db.json file and returns all saved notes as JSON
 app.get("/api/notes", (req, res) => {
@@ -24,32 +24,29 @@ app.get("/api/notes", (req, res) => {
 
 // Receives a new note to save on the request body and adds to db.json file and returns note to client
 app.post("/api/notes", (req, res) => {
-  let savedNotes = JSON.parse(fs.readFileSync("./db/db.json")); // reads db.json
+  let savedNotes = JSON.parse(fs.readFileSync("./db/db.json", "utf8")); // reads db.json
   let id = crypto.randomBytes(16).toString("hex"); // creates unique ID for each note 
   let newNote = { // creates a new note object with the ID 
     title: req.body.title,
     text: req.body.text, 
     id: id,
   }
-
   console.log("newNote:", newNote)
 
-    // pushes the new notes to the notes.index page 
-    savedNotes.push(newNote);
+  // pushes the new notes to the notes.index page 
+  savedNotes.push(newNote);
 
-    // writes all new notes to db.json
-    fs.writeFile("./db/db.json", JSON.stringify(savedNotes), (err) => {
-    if (err) throw err; 
-    res.json(savedNotes);
-    });
-    console.log("new note has been written");
+  // writes all new notes to db.json
+  fs.writeFileSync("./db/db.json", JSON.stringify(savedNotes), (err) => {
+  if (err) throw err; 
+  res.json(savedNotes);
+  });
+  console.log("A note new has been written");
 });
 
-https://stackoverflow.com/questions/52909217/how-to-delete-by-id-in-node-js/52909282
 // Receives query parameter containing ID of the note to delete. 
-// Get all the notes from the database with a read file and use filter function .filter to filter out the id and write back to the file minus the one that was filtered out 
 app.delete("/api/notes/:id", (req, res) => {
-  let savedNotes = JSON.parse(fs.readFileSync("./db/db.json")); // reads db.json
+  let savedNotes = JSON.parse(fs.readFileSync("./db/db.json", "utf8")); // reads db.json
   let noteID = savedNotes.filter(x=>x.id!=req.params.id) // returns route with all notes EXCEPT the ID we are deleting 
 
   console.log("NOTE ID", noteID)
@@ -60,10 +57,10 @@ app.delete("/api/notes/:id", (req, res) => {
    if (err) throw err; 
    res.json(savedNotes);
    });
-   console.log("Delete note");
+   console.log("Your note has been deleted");
 });
 
-// HTML ROUTES
+//______________ HTML ROUTES ______________
 
 // returns notes.html file
 app.get("/notes", (req, res) => {
